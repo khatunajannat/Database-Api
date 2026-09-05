@@ -1,10 +1,13 @@
 import express from "express";
 import mongoose from "mongoose";
 
-const port =4000;
-const app = express();
-mongoose.connect("mongodb+srv://khatunajannat35_db_user:Admito03Pass@cluster0.0zxk5rq.mongodb.net/").then((  )=>console.log("Connected to MongoDB") ).catch((err) => console.error("Error connecting to MongoDB:", err));
 
+const app = express();
+mongoose.connect(process.env.DB_URL)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("Error connecting to MongoDB:", err));
+const port = process.env.PORT || 4000;
+console.log(process.env.DB_URL);
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello World" });
 });
