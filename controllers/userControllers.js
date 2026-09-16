@@ -1,9 +1,17 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
+
+const signToken = (user) =>
+  jwt.sign(
+    { id: user._id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
 
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select('-password');
     return res.status(200).json(users);
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -25,11 +33,13 @@ export const createUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // role is never taken from req.body — always defaults to "user".
+    // Promote someone to admin directly in the database (see README notes).
     const user = await User.create({ name, phone, email, password: hashedPassword });
 
     return res.status(201).json({
       message: "User created successfully",
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -54,9 +64,12 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    const token = signToken(user);
+
     return res.status(200).json({
       message: "Login successful",
-      user: { id: user._id, name: user.name, email: user.email },
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
