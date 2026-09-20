@@ -1,6 +1,6 @@
 import Circular from '../models/circular.js';
 
-// GET /api/circulars — public, supports optional ?type= & ?status= filters
+// get all circulars for user and admin
 export const getAllCirculars = async (req, res) => {
   try {
     const { type, status } = req.query;
@@ -15,7 +15,7 @@ export const getAllCirculars = async (req, res) => {
   }
 };
 
-// GET /api/circulars/:id — public
+// get circular by ID for user and admin
 export const getCircularById = async (req, res) => {
   try {
     const circular = await Circular.findById(req.params.id);
@@ -28,7 +28,7 @@ export const getCircularById = async (req, res) => {
   }
 };
 
-// POST /api/circulars — admin only
+// create circular — admin only
 export const createCircular = async (req, res) => {
   try {
     const { university, type, unit, title, publishedDate, examDate, applyDeadline, status, link } = req.body;
@@ -55,7 +55,7 @@ export const createCircular = async (req, res) => {
   }
 };
 
-// PUT /api/circulars/:id — admin only
+// update circular(put in mongo) — admin only
 export const updateCircular = async (req, res) => {
   try {
     const circular = await Circular.findByIdAndUpdate(req.params.id, req.body, {
@@ -73,7 +73,7 @@ export const updateCircular = async (req, res) => {
   }
 };
 
-// DELETE /api/circulars/:id — admin only
+// delete circular — admin only
 export const deleteCircular = async (req, res) => {
   try {
     const circular = await Circular.findByIdAndDelete(req.params.id);
