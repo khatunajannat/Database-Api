@@ -1,6 +1,6 @@
 import ImportantDate from '../models/importantDate.js';
 
-// GET /api/important-dates — public, supports optional ?type= & ?category= filters
+//get all imp date for user and admin
 export const getAllImportantDates = async (req, res) => {
   try {
     const { type, category } = req.query;
@@ -15,7 +15,7 @@ export const getAllImportantDates = async (req, res) => {
   }
 };
 
-// GET /api/important-dates/:id — public
+//get all imp date for only admin
 export const getImportantDateById = async (req, res) => {
   try {
     const event = await ImportantDate.findById(req.params.id);
@@ -27,8 +27,8 @@ export const getImportantDateById = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
+//create  for admin only
 
-// POST /api/important-dates — admin only
 export const createImportantDate = async (req, res) => {
   try {
     const { title, university, type, category, date } = req.body;
@@ -44,7 +44,7 @@ export const createImportantDate = async (req, res) => {
   }
 };
 
-// PUT /api/important-dates/:id — admin only
+// update- only admin 
 export const updateImportantDate = async (req, res) => {
   try {
     const event = await ImportantDate.findByIdAndUpdate(req.params.id, req.body, {
@@ -62,7 +62,7 @@ export const updateImportantDate = async (req, res) => {
   }
 };
 
-// DELETE /api/important-dates/:id — admin only
+// delete -only admin
 export const deleteImportantDate = async (req, res) => {
   try {
     const event = await ImportantDate.findByIdAndDelete(req.params.id);
