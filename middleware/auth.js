@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 
-// Verifies the Bearer token and attaches the decoded payload to req.user
 export const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -19,7 +18,6 @@ export const verifyToken = (req, res, next) => {
   }
 };
 
-// Use after verifyToken. Blocks anyone whose role isn't "admin".
 export const requireAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Admin access required' });
