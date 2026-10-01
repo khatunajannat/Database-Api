@@ -1,4 +1,5 @@
 import Circular from '../models/circular.js';
+import { syncCircularDates, removeCircularDates } from '../utils/syncCircularDates.js';
 
 // get all circulars for user and admin
 export const getAllCirculars = async (req, res) => {
@@ -49,6 +50,9 @@ export const createCircular = async (req, res) => {
       link,
     });
 
+    // NEW: every circular also becomes important dates
+    await syncCircularDates(circular);
+
     return res.status(201).json({ message: "Circular created", circular });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -67,6 +71,9 @@ export const updateCircular = async (req, res) => {
       return res.status(404).json({ message: "Circular not found" });
     }
 
+    // NEW: keep the linked important dates matching the edited circular
+    await syncCircularDates(circular);
+
     return res.status(200).json({ message: "Circular updated", circular });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -80,6 +87,10 @@ export const deleteCircular = async (req, res) => {
     if (!circular) {
       return res.status(404).json({ message: "Circular not found" });
     }
+
+    // NEW: remove the dates that belonged to this circular
+    await removeCircularDates(circular._id);
+
     return res.status(200).json({ message: "Circular deleted" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
