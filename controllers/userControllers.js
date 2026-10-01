@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
+import User from '../Models/user.js'; // matches your "Models" folder name (works on Linux too)
 
 const signToken = (user) =>
   jwt.sign(
@@ -34,7 +34,7 @@ export const createUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // role is never taken from req.body — always defaults to "user".
-    // Promote someone to admin directly in the database (see README notes).
+    // Promote someone to admin directly in the database.
     const user = await User.create({ name, phone, email, password: hashedPassword });
 
     return res.status(201).json({
@@ -76,13 +76,26 @@ export const loginUser = async (req, res) => {
   }
 };
 
+// Returns the currently logged-in user (identified by the token)
+export const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    return res.status(200).json(user);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
 export const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("-password");
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    // users can only read their own record; admins can read any
+    if (req.user.id !== req.params.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
     }
+
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     return res.status(200).json(user);
   } catch (err) {
