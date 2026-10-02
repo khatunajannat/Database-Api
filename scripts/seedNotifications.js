@@ -38,7 +38,7 @@ try {
       type: 'status_update', category: 'status', read: false, createdAt: minutesAgo(2),
       title: 'Merit list for Phase 1 published',
       message: "Check your application status to see if you've been shortlisted for the next round.",
-      link: '/information', linkLabel: 'Check status',
+      link: '/applications', linkLabel: 'Check status',
     },
     {
       type: 'deadline_reminder', category: 'circular', read: false, createdAt: minutesAgo(60),
