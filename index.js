@@ -5,7 +5,7 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import circularRoutes from './routes/circularRoutes.js';
 import importantDateRoutes from './routes/importantDateRoutes.js';
-
+import applicationRoutes from './routes/applicationRoutes.js';
 
 dotenv.config();
 
@@ -18,6 +18,7 @@ app.use("/users", userRoutes);
 app.use('/api/circulars', circularRoutes);
 app.use('/api/important-dates', importantDateRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/applications', applicationRoutes);
 
 mongoose.connect(process.env.DB_URL)
   .then(() => console.log("Connected to MongoDB"))
