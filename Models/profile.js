@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-// Only metadata about an uploaded file lives in MongoDB. The file itself is on disk.
+// Only metadata about an uploaded file lives in MongoDB. The file itself is stored in Cloudinary.
 const fileSchema = new Schema(
   {
-    filename: String,     // generated name on disk
+    publicId: String,     // Cloudinary public_id (used to fetch and delete the file)
+    resourceType: String, // "image" or "raw" (PDFs are stored as raw)
     originalName: String, // what the user called it
     mimeType: String,
     size: Number,
