@@ -7,6 +7,8 @@ import circularRoutes from './routes/circularRoutes.js';
 import importantDateRoutes from './routes/importantDateRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import profileRoutes from "./routes/profileRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+
 
 dotenv.config();
 
@@ -21,6 +23,7 @@ app.use('/api/important-dates', importantDateRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 mongoose.connect(process.env.DB_URL)
   .then(() => console.log("Connected to MongoDB"))
