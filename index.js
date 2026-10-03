@@ -8,7 +8,7 @@ import importantDateRoutes from './routes/importantDateRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import profileRoutes from "./routes/profileRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
-
+import { startReminderJob } from "./jobs/reminderJob.js";
 
 dotenv.config();
 
@@ -26,7 +26,10 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 mongoose.connect(process.env.DB_URL)
-  .then(() => console.log("Connected to MongoDB"))
+  .then(() => {
+    console.log("Connected to MongoDB");
+    startReminderJob(); // daily deadline / exam reminders
+  })
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
 const port = process.env.PORT || 4000;
