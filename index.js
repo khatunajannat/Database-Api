@@ -11,6 +11,8 @@ import applicationRoutes from './routes/applicationRoutes.js';
 import profileRoutes from "./routes/profileRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import { startReminderJob } from "./jobs/reminderJob.js";
+import { carbonFootprint, getCarbonStats } from "./middleware/carbonFootprint.js";
+import { verifyToken, requireAdmin } from "./middleware/auth.js";
 
 dotenv.config();
 
@@ -28,6 +30,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use(carbonFootprint);
+app.get("/api/carbon", verifyToken, requireAdmin, getCarbonStats);
 
 mongoose.connect(process.env.DB_URL)
   .then(() => {
