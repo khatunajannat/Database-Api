@@ -1,6 +1,8 @@
 import Circular from '../models/circular.js';
+import { syncCircularDates, removeCircularDates } from '../utils/syncCircularDates.js';
+import { notifyCircularPublished, notifyCircularUpdated } from '../utils/notify.js';
 
-// GET /api/circulars — public, supports optional ?type= & ?status= filters
+// get all circulars for user and admin
 export const getAllCirculars = async (req, res) => {
   try {
     const { type, status } = req.query;
@@ -15,7 +17,7 @@ export const getAllCirculars = async (req, res) => {
   }
 };
 
-// GET /api/circulars/:id — public
+// get circular by ID for user and admin
 export const getCircularById = async (req, res) => {
   try {
     const circular = await Circular.findById(req.params.id);
@@ -28,7 +30,7 @@ export const getCircularById = async (req, res) => {
   }
 };
 
-// POST /api/circulars — admin only
+// create circular — admin only
 export const createCircular = async (req, res) => {
   try {
     const { university, type, unit, title, publishedDate, examDate, applyDeadline, status, link } = req.body;
@@ -49,15 +51,27 @@ export const createCircular = async (req, res) => {
       link,
     });
 
+    // NEW: every circular also becomes important dates
+    await syncCircularDates(circular);
+
+    // NEW: tell every student about the new circular
+    await notifyCircularPublished(circular);
+
     return res.status(201).json({ message: "Circular created", circular });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
 
-// PUT /api/circulars/:id — admin only
+// update circular(put in mongo) — admin only
 export const updateCircular = async (req, res) => {
   try {
+    // NEW: keep the old values so we can see what changed
+    const before = await Circular.findById(req.params.id).lean();
+    if (!before) {
+      return res.status(404).json({ message: "Circular not found" });
+    }
+
     const circular = await Circular.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -67,19 +81,29 @@ export const updateCircular = async (req, res) => {
       return res.status(404).json({ message: "Circular not found" });
     }
 
+    // NEW: keep the linked important dates matching the edited circular
+    await syncCircularDates(circular);
+
+    // NEW: tell students who applied if the deadline or exam date changed
+    await notifyCircularUpdated(before, circular);
+
     return res.status(200).json({ message: "Circular updated", circular });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
 
-// DELETE /api/circulars/:id — admin only
+// delete circular — admin only
 export const deleteCircular = async (req, res) => {
   try {
     const circular = await Circular.findByIdAndDelete(req.params.id);
     if (!circular) {
       return res.status(404).json({ message: "Circular not found" });
     }
+
+    // NEW: remove the dates that belonged to this circular
+    await removeCircularDates(circular._id);
+
     return res.status(200).json({ message: "Circular deleted" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
