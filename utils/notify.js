@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Notification from '../models/notification.js';
+import { mailEnabled, sendMail, buildEmail } from './mailer.js';
 
 // These two are looked up by name instead of imported, so we always use the
 // model your app already registered, whatever folder casing other files import from.
@@ -17,13 +18,67 @@ export const formatDate = (d) =>
     timeZone: TIME_ZONE,
   });
 
-// Insert many notifications. Never throws: a notification problem must not break
-// the real request (submitting an application, saving a circular...).
-// Duplicates (same user + dedupeKey) are skipped silently.
+// Sends one email per new notification. Runs in the background and never throws.
+async function deliverEmails(notifications) {
+  try {
+    if (!notifications?.length || !mailEnabled()) return;
+
+    const ids = [...new Set(notifications.map((n) => String(n.user)))];
+    const users = await User().find({ _id: { $in: ids } }).select('name email').lean();
+    const byId = new Map(users.map((u) => [String(u._id), u]));
+
+    // a few at a time, so a big circular announcement does not hammer the mail server
+    const BATCH = 5;
+    for (let i = 0; i < notifications.length; i += BATCH) {
+      await Promise.allSettled(
+        notifications.slice(i, i + BATCH).map((n) => {
+          const user = byId.get(String(n.user));
+          if (!user?.email) return null;
+          return sendMail({
+            to: user.email,
+            ...buildEmail({
+              name: user.name,
+              title: n.title,
+              message: n.message,
+              link: n.link,
+              linkLabel: n.linkLabel,
+            }),
+          });
+        })
+      );
+    }
+  } catch (err) {
+    console.error('Sending emails failed:', err.message);
+  }
+}
+
+// Saves notifications, then emails the people who got a NEW one.
+// Never throws: a notification/email problem must not break the real request
+// (submitting an application, saving a circular...).
+// Anything already saved (same user + dedupeKey) is skipped, so it is neither
+// duplicated in the app nor emailed twice.
 export async function safeInsert(docs) {
   if (!docs.length) return;
   try {
-    await Notification.insertMany(docs, { ordered: false });
+    const keyed = docs.filter((d) => d.dedupeKey);
+    let seen = new Set();
+    if (keyed.length) {
+      const found = await Notification.find({
+        user: { $in: [...new Set(keyed.map((d) => String(d.user)))] },
+        dedupeKey: { $in: [...new Set(keyed.map((d) => d.dedupeKey))] },
+      })
+        .select('user dedupeKey')
+        .lean();
+      seen = new Set(found.map((f) => `${f.user}|${f.dedupeKey}`));
+    }
+
+    const fresh = docs.filter((d) => !d.dedupeKey || !seen.has(`${d.user}|${d.dedupeKey}`));
+    if (!fresh.length) return;
+
+    const inserted = await Notification.insertMany(fresh, { ordered: false });
+
+    // emails go out in the background so the request / job is not slowed down
+    deliverEmails(inserted);
   } catch (err) {
     if (!String(err?.message).includes('E11000')) {
       console.error('Creating notifications failed:', err.message);
