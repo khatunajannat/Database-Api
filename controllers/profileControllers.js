@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import Profile, { DOC_KEYS } from "../Models/profile.js";
+import Profile, { DOC_KEYS } from "../models/profile.js";
 import cloudinary from "../config/cloudinary.js";
 
 // ---------- Required fields (same as the form; the server must check too) ----------

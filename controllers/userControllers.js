@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from '../Models/user.js'; // matches your "Models" folder name (works on Linux too)
+import User from '../models/user.js';
+import { notifyWelcome } from '../utils/notify.js';
 
 const signToken = (user) =>
   jwt.sign(
@@ -36,6 +37,9 @@ export const createUser = async (req, res) => {
     // role is never taken from req.body — always defaults to "user".
     // Promote someone to admin directly in the database.
     const user = await User.create({ name, phone, email, password: hashedPassword });
+
+    // NEW: welcome notification for the new account
+    await notifyWelcome(user);
 
     return res.status(201).json({
       message: "User created successfully",

@@ -25,4 +25,4 @@ const importantDateSchema = new Schema(
   { timestamps: true, versionKey: false }
 );
 
-export default mongoose.model('ImportantDate', importantDateSchema);
+export default mongoose.models.ImportantDate || mongoose.model('ImportantDate', importantDateSchema);

@@ -1,5 +1,6 @@
 import Circular from '../models/circular.js';
 import { syncCircularDates, removeCircularDates } from '../utils/syncCircularDates.js';
+import { notifyCircularPublished, notifyCircularUpdated } from '../utils/notify.js';
 
 // get all circulars for user and admin
 export const getAllCirculars = async (req, res) => {
@@ -53,6 +54,9 @@ export const createCircular = async (req, res) => {
     // NEW: every circular also becomes important dates
     await syncCircularDates(circular);
 
+    // NEW: tell every student about the new circular
+    await notifyCircularPublished(circular);
+
     return res.status(201).json({ message: "Circular created", circular });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -62,6 +66,12 @@ export const createCircular = async (req, res) => {
 // update circular(put in mongo) — admin only
 export const updateCircular = async (req, res) => {
   try {
+    // NEW: keep the old values so we can see what changed
+    const before = await Circular.findById(req.params.id).lean();
+    if (!before) {
+      return res.status(404).json({ message: "Circular not found" });
+    }
+
     const circular = await Circular.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -73,6 +83,9 @@ export const updateCircular = async (req, res) => {
 
     // NEW: keep the linked important dates matching the edited circular
     await syncCircularDates(circular);
+
+    // NEW: tell students who applied if the deadline or exam date changed
+    await notifyCircularUpdated(before, circular);
 
     return res.status(200).json({ message: "Circular updated", circular });
   } catch (err) {
