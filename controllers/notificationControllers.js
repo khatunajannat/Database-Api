@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Notification from '../Models/notification.js';
+import Notification from '../models/notification.js';
 
 const FILTERS = {
   all: {},

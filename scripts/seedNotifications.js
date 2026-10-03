@@ -8,8 +8,8 @@
 
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import User from '../Models/user.js';
-import Notification from '../Models/notification.js';
+import User from '../models/user.js';
+import Notification from '../models/notification.js';
 
 dotenv.config();
 

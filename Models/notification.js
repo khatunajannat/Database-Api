@@ -6,6 +6,7 @@ export const NOTIFICATION_TYPES = [
   'application_submitted',
   'status_update',
   'circular_published',
+  'circular_updated',
   'deadline_reminder',
   'exam_reminder',
   'general',
@@ -51,4 +52,4 @@ notificationSchema.index(
   { unique: true, partialFilterExpression: { dedupeKey: { $type: 'string' } } }
 );
 
-export default mongoose.model('Notification', notificationSchema);
+export default mongoose.models.Notification || mongoose.model('Notification', notificationSchema);

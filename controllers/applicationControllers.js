@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import Application from '../models/application.js';
 import Circular from '../models/circular.js';
 import ImportantDate from '../models/importantDate.js';
+import { notifyApplicationSubmitted } from '../utils/notify.js';
 
 const generateApplicationNo = () =>
   `ADM-${Date.now().toString(36).toUpperCase()}${Math.random()
@@ -84,6 +85,9 @@ export const submitApplication = async (req, res) => {
       applicationNo: generateApplicationNo(),
       formData,
     });
+
+    // NEW: tell the student their application was received
+    await notifyApplicationSubmitted(application);
 
     return res.status(201).json({ message: "Application submitted (demo)", application });
   } catch (err) {

@@ -20,4 +20,4 @@ const circularSchema = new Schema(
   { timestamps: true, versionKey: false }
 );
 
-export default mongoose.model('Circular', circularSchema);
+export default mongoose.models.Circular || mongoose.model('Circular', circularSchema);
