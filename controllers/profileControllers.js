@@ -119,9 +119,6 @@ export const saveProfile = async (req, res) => {
   }
 };
 
-// GET /api/profile/documents/:key — only the owner can fetch their own files.
-// The backend fetches the private file from Cloudinary with a signed URL and passes it on,
-// so the frontend keeps working exactly as before.
 export const getDocument = async (req, res) => {
   try {
     const { key } = req.params;
