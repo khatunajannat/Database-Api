@@ -1,15 +1,5 @@
 import { co2 } from '@tgwf/co2';
 
-// Measures how much data every API request / response transfers and estimates the
-// CO2 it causes, using the Sustainable Web Design model from CO2.js.
-//
-// .env settings (all optional):
-//   GREEN_HOST=true     set to "true" if your server runs on a green (renewable) host
-//   CARBON_LOG=false    set to "false" to stop the one-line log per request
-//
-// Totals are kept in memory and can be read by an admin at GET /api/carbon.
-// They reset when the server restarts.
-
 const estimator = new co2({ model: 'swd' });
 
 // .env is read when a request comes in (not when this file is imported),
@@ -34,8 +24,6 @@ const byteLength = (chunk, encoding) => {
   return chunk.length ?? 0; // Buffer / Uint8Array
 };
 
-// Request line + headers + body (the body size comes from the Content-Length header,
-// so it does not matter whether the body parser has run yet)
 function requestBytesOf(req) {
   let bytes = Buffer.byteLength(`${req.method} ${req.originalUrl} HTTP/${req.httpVersion}\r\n`);
   for (let i = 0; i < req.rawHeaders.length; i += 2) {

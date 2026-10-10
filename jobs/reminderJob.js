@@ -10,8 +10,6 @@ const Application = () => mongoose.model('Application');
 const SCHEDULE = '0 8 * * *'; // every day at 08:00 (in TIME_ZONE)
 const REMINDER_DAYS = [3, 1, 0]; // remind 3 days before, 1 day before, and on the day
 
-// Which important dates produce reminders, and how they look.
-// "form" (applications open) is left out on purpose: students who applied already know.
 const CATEGORY_INFO = {
   deadline: {
     type: 'deadline_reminder',
@@ -53,9 +51,6 @@ const prefixFor = (left) => (left === 0 ? 'Today' : left === 1 ? 'Tomorrow' : `I
 
 // ---------- the job ----------
 
-// Finds important dates that are 3 / 1 / 0 days away and notifies the students who
-// applied to that circular. Safe to run many times a day: every reminder has a
-// dedupeKey, so nobody gets the same reminder twice.
 export async function runReminders(now = new Date()) {
   try {
     const DAY = 24 * 60 * 60 * 1000;
@@ -102,8 +97,6 @@ export async function runReminders(now = new Date()) {
           link: '/applications',
           linkLabel: 'View application',
           circular: d.circular,
-          // date is part of the key, so if an admin moves the date the student
-          // is reminded again for the new date
           dedupeKey: `idate:${d._id}:${dayKey(d.date)}:${left}d`,
         });
       }
@@ -121,8 +114,5 @@ export async function runReminders(now = new Date()) {
 export function startReminderJob() {
   cron.schedule(SCHEDULE, () => runReminders(), { timezone: TIME_ZONE });
   console.log(`Reminder job scheduled (${SCHEDULE}, ${TIME_ZONE})`);
-
-  // Also run once at startup, in case the server was off at 08:00.
-  // The dedupeKey makes this harmless if reminders were already sent.
   runReminders();
 }
