@@ -2,8 +2,6 @@ import mongoose from 'mongoose';
 import Notification from '../models/notification.js';
 import { mailEnabled, sendMail, buildEmail } from './mailer.js';
 
-// These two are looked up by name instead of imported, so we always use the
-// model your app already registered, whatever folder casing other files import from.
 const User = () => mongoose.model('User');
 const Application = () => mongoose.model('Application');
 
@@ -52,11 +50,6 @@ async function deliverEmails(notifications) {
   }
 }
 
-// Saves notifications, then emails the people who got a NEW one.
-// Never throws: a notification/email problem must not break the real request
-// (submitting an application, saving a circular...).
-// Anything already saved (same user + dedupeKey) is skipped, so it is neither
-// duplicated in the app nor emailed twice.
 export async function safeInsert(docs) {
   if (!docs.length) return;
   try {
@@ -156,9 +149,6 @@ export async function notifyCircularPublished(circular) {
 const dateChanged = (a, b) =>
   (a ? new Date(a).getTime() : null) !== (b ? new Date(b).getTime() : null);
 
-// Admin edited a circular -> if the deadline or exam date changed,
-// notify only the students who applied to it.
-// `before` is the circular as it was before the edit, `after` is the saved one.
 export async function notifyCircularUpdated(before, after) {
   try {
     const lines = [];

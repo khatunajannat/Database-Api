@@ -1,15 +1,5 @@
 import nodemailer from 'nodemailer';
 
-// Everything reads process.env when it is CALLED (not when this file is imported),
-// because dotenv.config() in index.js runs after the imports.
-//
-// .env settings:
-//   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS   (required to send emails)
-//   MAIL_FROM        e.g.  Admito <you@gmail.com>   (optional, defaults to SMTP_USER)
-//   FRONTEND_URL     e.g.  http://localhost:5173    (used for the button link in emails)
-//   SMTP_SECURE      "true" only if your provider says so (default: true for port 465)
-//   MAIL_ENABLED     set to "false" to switch emails off completely
-
 const env = () => process.env;
 
 export const mailEnabled = () =>
