@@ -1,3 +1,4 @@
+import { sendServerError } from '../utils/httpError.js';
 import Circular from '../models/circular.js';
 import { syncCircularDates, removeCircularDates } from '../utils/syncCircularDates.js';
 import { notifyCircularPublished, notifyCircularUpdated } from '../utils/notify.js';
@@ -13,7 +14,7 @@ export const getAllCirculars = async (req, res) => {
     const circulars = await Circular.find(filter).sort({ publishedDate: -1 });
     return res.status(200).json(circulars);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -26,7 +27,7 @@ export const getCircularById = async (req, res) => {
     }
     return res.status(200).json(circular);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -59,7 +60,7 @@ export const createCircular = async (req, res) => {
 
     return res.status(201).json({ message: "Circular created", circular });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -89,7 +90,7 @@ export const updateCircular = async (req, res) => {
 
     return res.status(200).json({ message: "Circular updated", circular });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -106,6 +107,6 @@ export const deleteCircular = async (req, res) => {
 
     return res.status(200).json({ message: "Circular deleted" });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };

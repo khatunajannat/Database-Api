@@ -1,3 +1,4 @@
+import { sendServerError } from '../utils/httpError.js';
 import Banner from "../models/banner.js";
 import cloudinary from "../config/cloudinary.js";
 
@@ -31,7 +32,7 @@ export const getActiveBanners = async (req, res) => {
     res.set("Cache-Control", "public, max-age=60");
     return res.status(200).json(banners);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -40,7 +41,7 @@ export const getAllBanners = async (req, res) => {
   try {
     return res.status(200).json(await Banner.find().sort({ order: 1, createdAt: -1 }));
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -57,7 +58,7 @@ export const createBanner = async (req, res) => {
     });
     return res.status(201).json({ message: "Slide added", banner });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -77,7 +78,7 @@ export const updateBanner = async (req, res) => {
     await banner.save();
     return res.status(200).json({ message: "Slide updated", banner });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -88,6 +89,6 @@ export const deleteBanner = async (req, res) => {
     await cloudinary.uploader.destroy(banner.publicId).catch(() => {});
     return res.status(200).json({ message: "Slide deleted" });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };

@@ -1,3 +1,4 @@
+import { sendServerError } from '../utils/httpError.js';
 import mongoose from 'mongoose';
 import Notification from '../models/notification.js';
 
@@ -34,7 +35,7 @@ export const getMyNotifications = async (req, res) => {
 
     return res.status(200).json({ notifications, unreadCount, page, hasMore });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -47,7 +48,7 @@ export const getUnreadCount = async (req, res) => {
     });
     return res.status(200).json({ unreadCount });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -62,7 +63,7 @@ export const markAllAsRead = async (req, res) => {
       .status(200)
       .json({ message: 'All notifications marked as read', updated: result.modifiedCount });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -84,7 +85,7 @@ export const markAsRead = async (req, res) => {
     }
     return res.status(200).json(notification);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -105,6 +106,6 @@ export const deleteNotification = async (req, res) => {
     }
     return res.status(200).json({ message: 'Notification deleted' });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };

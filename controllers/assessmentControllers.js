@@ -1,3 +1,4 @@
+import { sendServerError } from '../utils/httpError.js';
 import Assessment from "../models/assessment.js";
 
 // GET all assessments — public
@@ -6,7 +7,7 @@ export const getAllAssessments = async (req, res) => {
     const assessments = await Assessment.find().sort({ name: 1 });
     return res.status(200).json(assessments);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -21,7 +22,7 @@ export const getAssessmentById = async (req, res) => {
 
     return res.status(200).json(assessment);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -35,7 +36,7 @@ export const createAssessment = async (req, res) => {
       assessment,
     });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -60,7 +61,7 @@ export const updateAssessment = async (req, res) => {
       assessment,
     });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -77,6 +78,6 @@ export const deleteAssessment = async (req, res) => {
       message: "Assessment deleted",
     });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };

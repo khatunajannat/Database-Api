@@ -1,3 +1,4 @@
+import { sendServerError } from '../utils/httpError.js';
 import ImportantDate from '../models/importantDate.js';
 import Circular from '../models/circular.js';
 
@@ -14,7 +15,7 @@ export const getAllImportantDates = async (req, res) => {
     const events = await ImportantDate.find(filter).sort({ date: 1 });
     return res.status(200).json(events);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -27,7 +28,7 @@ export const getImportantDateById = async (req, res) => {
     }
     return res.status(200).json(event);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -64,7 +65,7 @@ export const createImportantDate = async (req, res) => {
     });
     return res.status(201).json({ message: "Event created", event });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -84,7 +85,7 @@ export const updateImportantDate = async (req, res) => {
 
     return res.status(200).json({ message: "Event updated", event });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -97,6 +98,6 @@ export const deleteImportantDate = async (req, res) => {
     }
     return res.status(200).json({ message: "Event deleted" });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };

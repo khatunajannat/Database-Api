@@ -1,3 +1,4 @@
+import { sendServerError } from '../utils/httpError.js';
 import mongoose from 'mongoose';
 import Application from '../models/application.js';
 import Circular from '../models/circular.js';
@@ -97,7 +98,7 @@ export const submitApplication = async (req, res) => {
     if (err.code === 11000) {
       return res.status(409).json({ message: "You have already applied to this circular" });
     }
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -111,7 +112,7 @@ export const getMyApplications = async (req, res) => {
 
     return res.status(200).json(await attachTimelines(applications));
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -136,7 +137,7 @@ export const getApplicationById = async (req, res) => {
     const [withTimeline] = await attachTimelines([application]);
     return res.status(200).json(withTimeline);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -157,6 +158,6 @@ export const deleteApplication = async (req, res) => {
     }
     return res.status(200).json({ message: "Application withdrawn" });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };

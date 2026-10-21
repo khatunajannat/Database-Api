@@ -1,3 +1,4 @@
+import { sendServerError } from '../utils/httpError.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
@@ -15,7 +16,7 @@ export const getAllUsers = async (req, res) => {
     const users = await User.find().select('-password');
     return res.status(200).json(users);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -25,6 +26,10 @@ export const createUser = async (req, res) => {
 
     if (!name || !phone || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (String(password).length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters" });
     }
 
     const existing = await User.findOne({ email });
@@ -46,7 +51,7 @@ export const createUser = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -76,7 +81,7 @@ export const loginUser = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -87,7 +92,7 @@ export const getMe = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
     return res.status(200).json(user);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };
 
@@ -103,6 +108,6 @@ export const getUserById = async (req, res) => {
 
     return res.status(200).json(user);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return sendServerError(res, err);
   }
 };

@@ -1,3 +1,4 @@
+import { sendServerError } from '../utils/httpError.js';
 import crypto from "crypto";
 import Profile, { DOC_KEYS } from "../models/profile.js";
 import cloudinary from "../config/cloudinary.js";
@@ -57,7 +58,7 @@ export const getProfile = async (req, res) => {
     const profile = await Profile.findOne({ user: req.user.id });
     res.json(profile); // null if the user hasn't saved yet
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    sendServerError(res, err);
   }
 };
 
@@ -115,7 +116,7 @@ export const saveProfile = async (req, res) => {
   } catch (err) {
     console.error("saveProfile failed:", err);
     await Promise.all(uploaded.map((f) => deleteFromCloudinary(f.publicId, f.resourceType)));
-    res.status(500).json({ message: err.message });
+    sendServerError(res, err);
   }
 };
 
@@ -147,6 +148,6 @@ export const getDocument = async (req, res) => {
     res.set("Cache-Control", "private, max-age=300");
     res.send(Buffer.from(await upstream.arrayBuffer()));
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    sendServerError(res, err);
   }
 };

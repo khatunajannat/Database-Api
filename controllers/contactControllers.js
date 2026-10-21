@@ -23,8 +23,7 @@ export const createContact = async (req, res) => {
     console.error("CONTACT ERROR:", error);
 
     res.status(500).json({
-      message: "Failed to send message",
-      error: error.message
+      message: "Failed to send message"
     });
   }
 };
