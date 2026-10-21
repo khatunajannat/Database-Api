@@ -1,4 +1,4 @@
-import Assessment from "../Models/assessment.js";
+import Assessment from "../models/assessment.js";
 
 // GET all assessments — public
 export const getAllAssessments = async (req, res) => {
