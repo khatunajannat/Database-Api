@@ -1,5 +1,5 @@
 import multer from "multer";
-import { DOC_KEYS } from "../Models/profile.js";
+import { DOC_KEYS } from "../models/profile.js";
 
 const ALLOWED = ["image/jpeg", "image/png", "application/pdf"];
 
